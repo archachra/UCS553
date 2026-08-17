@@ -1,0 +1,244 @@
+Assignment 2
+Q1. 
+
+Package Structure:
+food.model
+food.utility
+food.main
+
+food.model.FoodOrder.java
+
+package food.model;
+public abstract class FoodOrder {
+private int orderId;
+private String customerName;
+private double amount;
+static String restaurantName = "Food Hub";
+static int orderCount = 0;
+public FoodOrder(int orderId, String customerName, double amount) {
+this.orderId = orderId;
+this.customerName = customerName;
+this.amount = amount;
+orderCount++;
+}
+public int getOrderId() {
+return orderId;
+}
+public String getCustomerName() {
+return customerName;
+}
+public double getAmount() {
+return amount;
+}
+public void setAmount(double amount) {
+this.amount = amount;
+}
+public static void displayTotalOrders() {
+System.out.println("Total Orders: " + orderCount);
+}
+public abstract double calculateDeliveryCharge();
+public void displayBill() {
+System.out.println("Order ID: " + orderId);
+System.out.println("Customer: " + customerName);
+System.out.println("Amount: " + amount);
+}
+}
+
+food.model.Discountable.java
+
+package food.model;
+public interface Discountable {
+double applyDiscount();
+}
+
+food.model.RegularOrder.java
+
+package food.model;
+public class RegularOrder extends FoodOrder implements Discountable {
+public RegularOrder(int id, String name, double amount) {
+super(id, name, amount);
+}
+public double calculateDeliveryCharge() {
+return 80;
+}
+public double applyDiscount() {
+return getAmount() * 0.10;
+}
+}
+
+food.model.PremiumOrder.java
+
+package food.model;
+public class PremiumOrder extends FoodOrder implements Discountable {
+public PremiumOrder(int id, String name, double amount) {
+super(id, name, amount);
+}
+public double calculateDeliveryCharge() {
+return 50;
+}
+public double applyDiscount() {
+return getAmount() * 0.15;
+}
+}
+
+food.utility.OrderUtility.java
+
+package food.utility;
+import food.model.FoodOrder;
+public class OrderUtility {
+public static boolean validateAmount(double amount) {
+return amount > 0;
+}
+public static boolean validateCustomerName(String name) {
+return name != null && !name.isEmpty();
+}
+public static void generateSummary(FoodOrder order) {
+System.out.println("----- Order Summary -----");
+order.displayBill();
+}
+}
+
+food.main.Main.java
+
+package food.main;
+import food.model.*;
+import food.utility.OrderUtility;
+public class Main {
+public static void main(String[] args) {
+FoodOrder[] orders = new FoodOrder[6];
+orders[0] = new RegularOrder(1,"Amit",500);
+orders[1] = new PremiumOrder(2,"Rahul",1000);
+orders[2] = new RegularOrder(3,"Neha",700);
+orders[3] = new PremiumOrder(4,"Karan",1200);
+orders[4] = new RegularOrder(5,"Riya",400);
+orders[5] = new PremiumOrder(6,"Raj",900);
+for(FoodOrder order : orders) {
+OrderUtility.generateSummary(order);
+Discountable d = (Discountable) order;
+double discount = d.applyDiscount();
+double delivery = order.calculateDeliveryCharge();
+double finalAmount =
+order.getAmount() - discount + delivery;
+System.out.println("Discount: " + discount);
+System.out.println("Delivery Charge: " + delivery);
+System.out.println("Final Amount: " + finalAmount);
+System.out.println();
+}
+FoodOrder.displayTotalOrders();
+}
+}
+
+Q2. 
+
+Package Structure:
+library.model
+library.util
+library.main
+
+library.model.LibraryResource.java
+
+package library.model;
+public abstract class LibraryResource {
+private int resourceId;
+private String title;
+private String author;
+static String libraryName = "Central Library";
+static int resourceCount = 0;
+public LibraryResource(int id,String title,String author) {
+this.resourceId=id;
+this.title=title;
+this.author=author;
+resourceCount++;
+}
+public int getResourceId() {
+return resourceId;
+}
+public String getTitle() {
+return title;
+}
+public String getAuthor() {
+return author;
+}
+public static void displayTotalResources() {
+System.out.println("Total Resources: "+resourceCount);
+}
+public abstract double calculateFine(int days);
+}
+
+library.model.Printable.java
+
+package library.model;
+public interface Printable {
+void printDetails();
+}
+
+library.model.Book.java
+
+package library.model;
+public class Book extends LibraryResource implements Printable {
+public Book(int id,String title,String author) {
+super(id,title,author);
+}
+public double calculateFine(int days) {
+return days * 5;
+}
+public void printDetails() {
+System.out.println(getTitle()+" Book");
+}
+}
+
+library.model.DigitalResource.java
+
+package library.model;
+public class DigitalResource extends LibraryResource implements
+Printable {
+public DigitalResource(int id,String title,String author) {
+super(id,title,author);
+}
+public double calculateFine(int days) {
+return days * 2;
+}
+public void printDetails() {
+System.out.println(getTitle()+" Digital Resource");
+}
+}
+
+library.util.InputValidator.java
+
+package library.util;
+public class InputValidator {
+public static boolean validateResourceId(int id) {
+return id > 0;
+}
+public static boolean validateFineDays(int days) {
+return days >= 0;
+}
+}
+
+library.main.Main.java
+
+package library.main;
+import library.model.*;
+public class Main {
+public static void main(String[] args) {
+LibraryResource[] resources =
+new LibraryResource[5];
+resources[0] = new Book(1,"Java","James");
+resources[1] = new DigitalResource(2,"AI","John");
+resources[2] = new Book(3,"DBMS","Korth");
+resources[3] = new DigitalResource(4,"Python","Guido");
+resources[4] = new Book(5,"Networks","Tanenbaum");
+int[] overdueDays = {5,10,3,7,2};
+double totalFine = 0;
+for(int i=0;i<resources.length;i++) {
+Printable p = (Printable)resources[i];
+p.printDetails();
+double fine =
+resources[i].calculateFine(overdueDays[i]);
+System.out.println("Fine: "+fine);
+totalFine += fine;
+}
+System.out.println("Total Fine: "+totalFine);
+LibraryResource.displayTotalResources();
+}
+}
